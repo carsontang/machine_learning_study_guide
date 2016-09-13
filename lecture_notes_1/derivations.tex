@@ -1,0 +1,176 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+
+% Preamble
+\title{CS229 Lecture 1 Derivations}
+\date{September 5, 2016}
+\author{Carson Tang}
+\pagenumbering{arabic}
+
+\begin{document}
+\maketitle
+\section{Update Rule for Linear Regression}
+\begin{align*}
+\frac{\partial J(\theta)}{\partial \theta_j} &=
+\frac{\partial}{\partial \theta_j}\left( \frac{1}{2} \sum_{i = 0}^m \left( \theta^T x^{(i)} - y^{(i)} \right)^2 \right)\\
+&= \frac{1}{2} \frac{\partial}{\partial \theta_j}
+\left[
+    \left( \theta^T x^{(0)} - y^{(0)} \right)^2 +
+    \left( \theta^T x^{(1)} - y^{(1)} \right)^2 +
+    \cdots +
+    \left( \theta^T x^{(m)} - y^{(m)} \right)^2
+\right]\\
+&= \underbrace{\frac{1}{2}
+\left[
+    \frac{\partial}{\partial \theta_j} \left( \theta^T x^{(0)} - y^{(0)} \right)^2 +
+    \frac{\partial}{\partial \theta_j} \left( \theta^T x^{(1)} - y^{(1)} \right)^2 +
+    \cdots +
+    \frac{\partial}{\partial \theta_j} \left( \theta^T x^{(m)} - y^{(m)} \right)^2
+\right]}_{\text{via the sum rule}}\\
+\begin{split}
+{}&= \frac{1}{2} \left[ 2 \left( \theta^T x^{(0)} - y^{(0)} \right) \cdot \frac{\partial}{\partial \theta_j}
+        \left( \theta^T x^{(0)} - y^{(0)} \right) +
+    2 \left( \theta^T x^{(1)} - y^{(1)} \right) \cdot \frac{\partial}{\partial \theta_j}
+        \left( \theta^T x^{(1)} - y^{(1)} \right) \right. \\
+         {}& \quad + \cdots + \left. 2 \left( \theta^T x^{(m)} - y^{(m)} \right) \cdot \frac{\partial}{\partial \theta_j}
+        \left( \theta^T x^{(m)} - y^{(m)} \right) \right]
+\end{split}\\
+&= \frac{1}{2}
+\left[
+    2 \left( \theta^T x^{(0)} - y^{(0)} \right) \cdot x^{(0)}_j +
+    2 \left( \theta^T x^{(1)} - y^{(1)} \right) \cdot x^{(1)}_j +
+    \cdots +
+    2 \left( \theta^T x^{(m)} - y^{(m)} \right) \cdot x^{(m)}_j
+\right]\\
+&= \frac{1}{2} \underbrace{\sum_{i = 0}^m 2 \left( \theta^T x^{(i)} - y^{(i)} \right)
+    \cdot x^{(i)}_j}_{\text{extract the 2 via the distributive property of multiplication}} \\
+&= \sum_{i = 0}^m \left( \theta^T x^{(i)} - y^{(i)} \right) \cdot x^{(i)}_j
+\end{align*}
+
+\section{\(tr(AB) = tr(BA) \)}
+\begin{align}
+tr(A)    & = \sum_{i=1}^n A_{ii}\\
+tr(AB) & = tr(C)\\
+AB_{ii} & = \sum_{k=1}^nA_{ik}B_{ki}\\
+BA_{ii} & = \sum_{k=1}^nB_{ik}A_{ki}\\
+C_{ij}  & = \sum_{k=1}^nA_{ik}B_{kj}\\
+tr(C)   & = \sum_{i=1}^nC_{ii}\\
+& = \sum_{i=1}^nAB_{ii}\\
+& = \sum_{i=1}^n\sum_{k=1}^nA_{ik}B_{ki} = \sum_{i=1}^n\sum_{k=1}^nB_{ki}A_{ik} = \sum_{k=1}^n\sum_{i=1}^nB_{ki}A_{ik}\\
+& = \sum_{k=1}^nBA_{kk}\\
+& = tr(BA) = tr(AB)
+\end{align}
+
+(1) is the definition of $trace$. Every element $AB_{ij}$ in the matrix $AB$ is the dot product of $A$'s $i$th row and $B$'s $j$th column. You can picture in your head iterating through $A$'s $i$th row, element by element, each one getting multiplied by its corresponding $B$'s $j$th column's element. To put it in a different way, imagine A's row fixed and B's column fixed. Now turn B over into a row. Next, pair up A and B's elements and multiply them, and finally add them. The switches in (8) made because of the commutative property of addition. $i$ and $k$ are both iterating up to $n$, so these two elements are no different from each other. We're simply rearranging the elements. This might be harder to see, so let's show that for $n = 2$, this is true.
+
+\begin{align*}
+& \sum_{i=1}^2\sum_{k=1}^2A_{ik}B_{ki}\\
+& = \sum_{i=1}^2(A_{i1}B_{1i} + A_{i2}B_{2i})\\
+& = (A_{11}B_{11} + A_{12}B_{21}) + (A_{21}B_{12} + A_{22}B_{22})\\
+& = (B_{11}A_{11} + B_{21}A_{12 }) + (B_{12}A_{21} + B_{22}A_{22})\\
+& = (B_{11}A_{11} + B_{12}A_{21}) + (B_{21}A_{12 } + B_{22}A_{22})\\
+& = \sum_{i=1}^2(B_{i1}A_{1i} + B_{i2}A_{2i})\\
+&= \sum_{i=1}^2\sum_{k=1}^2B_{ik}A_{ki}\\
+\end{align*}
+
+As you can see, by writing out the double summation for a $2\times2$ matrix, you are rearranging the grouping the products of the elements of $A$ and $B$. Originally, they were ordered by columns of $B$. Then, they were ordered by the rows of $B$. Yet another way to think about this would be to put on your computer science hat, and see that it does not matter that you iterate through the inside summation first. The inside summation makes you add up the dot product of the elements of the columns of $A$ with the rows of $B$. The outside summation makes you add up the dot product of the elements of columns of $B$ with the rows of $A$. You can also read a crystal clear explanation \href{http://math.stackexchange.com/questions/1314142/trace-of-ab-trace-of-ba/1314147}{\textbf{here}} 
+
+\section{\(tr(ABC) = tr(ACB) = ... = tr(CBA)\)}
+\begin{align*}
+tr(ABC) & = tr((AB)C) = tr(DC) = tr(CD)\\
+& = tr(CAB) = tr(EB) = tr(BE) = tr(BAC) = \text{and so on}
+\end{align*}
+
+\section{\(tr(A) = tr(A^{T}) \)}
+\begin{align*}
+tr(A^T) &= \sum_{i=1}^N(A^T)_{ii}\\
+&= \sum_{i=1}^NA_{ii}\\
+&= tr(A)
+\end{align*}
+
+$tr(A^T) = tr(A)$ is pretty straightforward because the elements along on a matrix's diagonal are equal to the transpose matrix's.
+
+\section{\(tr(A + B) = tr(A) + tr(B) \)}
+\begin{align*}
+C &= A + B\\
+tr(A) + tr(B) &= \sum_{i=1}^NA_{ii} + \sum_{i=1}^NB_{ii}\\
+&=  \sum_{i=1}^N(A_{ii} + B_{ii})\\
+&= \sum_{i=1}^NC_{ii}\\
+&= tr(C)\\
+&= tr(A + B)
+\end{align*}
+
+The sum of the traces (diagonal sums) is equal to the sum of the diagonals of the sum.
+
+\section{\(tr(aA) = atr(A) \)}
+\begin{align*}
+C_{ii} &= aA_{ii}\\
+atr(A) &=a \sum_{i=1}^nA_{ii}\\
+&= \sum_{i=1}^naA_{ii} \;\; \text{(distributive property of multiplication)}\\
+&= \sum_{i=1}^nC_{ii}\\
+&= tr(C) = tr(aA)
+\end{align*}
+
+\section{ \(\nabla_{A}tr(AB) = B^{T}\)}
+Remember, $trace$ is function on \textbf{square matrices}.
+\begin{align}
+f(AB) &= tr(AB)\\
+\nabla_{A}tr(AB) = \nabla_{A}f(AB) &= \left[
+\begin{matrix}
+\frac{\partial f}{\partial A_{11}} & \ldots & \frac{\partial f}{\partial A_{1n}}\\
+\vdots & \ddots & \vdots\\
+\frac{\partial f}{\partial A_{n1}} & \ldots & \frac{\partial f}{\partial A_{nn}}\\
+\end{matrix}
+\right]\\
+AB_{ii} &= \sum_{k=1}^nA_{ik}B_{ki} \\
+tr(AB) &= \sum_{i=1}^{n}\sum_{k=1}^nA_{ik}B_{ki} \\
+&= A_{11}B_{11} + A_{12}B_{21} + \ldots + A_{1n}B_{n1}\\
+&+ A_{21}B_{12} + A_{22}B_{22} + \ldots + A_{2n}B_{n2}\\
+& \vdots\\
+&+ A_{n1}B_{1n} + A_{n2}B_{2n} + \ldots + A_{nn}B_{nn}\\
+\frac{\partial f}{\partial A_{ij}} &= B_{ji}\\
+\nabla_{A}tr(AB) &= \left[
+\begin{matrix}
+B_{11} & \ldots & B_{n1}\\
+\vdots & \ddots & \vdots\\
+B_{1n} & \ldots & B_{nn}\\
+\end{matrix}
+\right]\\
+&= B^{T}\\
+\end{align}
+$\frac{\partial f}{\partial A_{ij}} = B_{ji}$ from above can be seen if you write out the double summation and take a few partial derivatives, as shown below
+\begin{align*}
+\frac{\partial f}{\partial A_{11}} &= \frac{\partial (\sum_{i=1}^{n}\sum_{k=1}^nA_{ik}B_{ki})}{\partial A_{11}}\\
+&= B_{11}\\
+\frac{\partial f}{\partial A_{12}} &= \frac{\partial (\sum_{i=1}^{n}\sum_{k=1}^nA_{ik}B_{ki})}{\partial A_{12}}\\
+&= B_{21}\\
+\end{align*}
+
+\section{\(\nabla_{A^{T}}f(A) = (\nabla_{A}f(A))^{T}\)}
+
+\begin{align*}
+\nabla_{A^{T}}f(A) &= \left[
+\begin{matrix}
+\frac{\partial f}{\partial A_{11}} & \ldots & \frac{\partial f}{\partial A_{n1}}\\
+\vdots & \ddots & \vdots\\
+\frac{\partial f}{\partial A_{1n}} & \ldots & \frac{\partial f}{\partial A_{nn}}\\
+\end{matrix}
+\right] = (\nabla_{A}f(A))^{T}
+\end{align*}
+
+\section{\(\nabla_{A}trABA^{T}C = CAB + C^{T}AB^{T}\)}
+\begin{align*}
+\nabla_{A}trABA^{T}C &= \nabla_{A}trA^{T}ABC\\
+D &= BCA^{T} \\
+\nabla_{A}trABCA^{T} &= \nabla_{A}trAD  \\
+&= D^{T} = (BCA^{T})^{T}\\
+E &= BC \\
+(EA^{T})^{T} &= (A^{T})^{T}E^{T}\\
+&= AE^{T} \\
+&= A(BC)^{T} \\
+C^{T}AB^{T} &= \\
+trBA^{T}C &= trA^{T}BC
+\end{align*}
+\end{document}
